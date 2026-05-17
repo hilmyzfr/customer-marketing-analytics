@@ -96,3 +96,37 @@ CREATE INDEX IF NOT EXISTS idx_fact_product
     ON fact_transactions(product_key);
 CREATE INDEX IF NOT EXISTS idx_fact_invoice
     ON fact_transactions(invoice_no);
+
+
+-- ------------------------------------------------------------
+-- AUDIT: etl_quality_log
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS etl_quality_log (
+    log_id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id          TEXT NOT NULL,
+    source_row      INTEGER,
+    invoice_no      TEXT,
+    customer_id     TEXT,
+    issue_type      TEXT NOT NULL,
+    issue_detail    TEXT,
+    logged_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_quality_run 
+    ON etl_quality_log(run_id);
+CREATE INDEX IF NOT EXISTS idx_quality_type 
+    ON etl_quality_log(issue_type);
+
+-- ------------------------------------------------------------
+-- AUDIT: etl_runs
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS etl_runs (
+    run_id          TEXT PRIMARY KEY,
+    started_at      TIMESTAMP NOT NULL,
+    completed_at    TIMESTAMP,
+    status          TEXT NOT NULL DEFAULT 'RUNNING',
+    rows_extracted  INTEGER DEFAULT 0,
+    rows_loaded     INTEGER DEFAULT 0,
+    rows_rejected   INTEGER DEFAULT 0,
+    error_message   TEXT
+);
