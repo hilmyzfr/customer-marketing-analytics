@@ -37,7 +37,7 @@ rfm_ntile AS (
         recency_days,
         frequency,
         monetary,
-        6 - NTILE(5) OVER (ORDER BY recency_days DESC) AS r_score,
+        6 - NTILE(5) OVER (ORDER BY recency_days ASC) AS r_score,
         NTILE(5) OVER (ORDER BY frequency ASC)          AS f_score,
         NTILE(5) OVER (ORDER BY monetary ASC)           AS m_score
     FROM customer_rfm_raw
