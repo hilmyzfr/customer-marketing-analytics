@@ -57,6 +57,7 @@ def transform(raw_df: pd.DataFrame) -> TransformResult:
     for col in ["InvoiceNo", "StockCode", "Description", "CustomerID", "Country"]:
         df[col] = df[col].astype(str).str.strip()
         df[col] = df[col].replace("nan", pd.NA)
+        df[col] = df[col].replace("", pd.NA)  # add this line
 
     # 4. Null CustomerID
     null_cust = df["CustomerID"].isna()
