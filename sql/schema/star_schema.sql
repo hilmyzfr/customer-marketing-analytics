@@ -130,3 +130,27 @@ CREATE TABLE IF NOT EXISTS etl_runs (
     rows_rejected   INTEGER DEFAULT 0,
     error_message   TEXT
 );
+
+
+-- ------------------------------------------------------------
+-- ANALYTICAL: rfm_scores
+-- Materialised on each ETL run
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS rfm_scores (
+    rfm_id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_key    INTEGER NOT NULL REFERENCES dim_customer(customer_key),
+    customer_id     TEXT NOT NULL,
+    country         TEXT,
+    recency_days    INTEGER NOT NULL,
+    frequency       INTEGER NOT NULL,
+    monetary        REAL NOT NULL,
+    r_score         INTEGER NOT NULL,
+    f_score         INTEGER NOT NULL,
+    m_score         INTEGER NOT NULL,
+    rfm_score       TEXT NOT NULL,
+    rfm_segment     TEXT NOT NULL,
+    computed_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_rfm_customer
+    ON rfm_scores(customer_key);

@@ -35,6 +35,7 @@ def load(
         _load_dim_customer(conn, clean_df)
         _load_dim_product(conn, clean_df)
         rows_loaded = _load_fact_transactions(conn, clean_df)
+        _load_rfm_scores(conn)
         _log_quality_issues(conn, issues, run_id)
 
     stats["rows_loaded"] = rows_loaded
@@ -201,3 +202,20 @@ def _log_quality_issues(
         rows,
     )
     logger.info("etl_quality_log: %d issues recorded", len(rows))
+
+
+
+def _load_rfm_scores(conn: sqlite3.Connection) -> None:
+    sql_path = Path(__file__).parents[2] / "sql" / "queries" / "rfm_scores.sql"
+    rfm_sql = sql_path.read_text()
+
+    conn.execute("DELETE FROM rfm_scores")
+    conn.execute(
+        f"INSERT INTO rfm_scores "
+        f"(customer_key, customer_id, country, recency_days, frequency, monetary, "
+        f"r_score, f_score, m_score, rfm_score, rfm_segment) "
+        f"{rfm_sql}"
+    )
+    count = conn.execute("SELECT COUNT(*) FROM rfm_scores").fetchone()[0]
+    logger.info("rfm_scores: %d rows materialised", count)
+
